@@ -124,13 +124,18 @@ Then open http://localhost:8501.
 ### requirements.txt
 
 ```
-streamlit>=1.30.0
-ultralytics>=8.3.0
-opencv-python-headless>=4.8.0
-pillow>=10.0.0
-numpy>=1.24.0
-pandas>=2.0.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+streamlit
+ultralytics
+torch==2.12.1+cpu
+torchvision==0.27.1+cpu
+opencv-python==4.13.0.92
+numpy>=1.23.5,<3
+pillow
+pandas
 ```
+
+The CPU-only PyTorch wheels avoid downloading CUDA libraries on Streamlit Community Cloud, which runs inference on CPU.
 
 ## 🗄️ Database Schema
 
