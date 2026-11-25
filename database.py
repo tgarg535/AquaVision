@@ -35,6 +35,19 @@ def init_db(db_path: str = DEFAULT_DB_PATH) -> None:
             )
             """
         )
+        cursor.execute(
+            """
+            CREATE VIEW IF NOT EXISTS detection_logs AS
+            SELECT 
+                id, 
+                timestamp, 
+                filename, 
+                total_detected AS total_objects, 
+                highest_confidence, 
+                class_summary AS class_breakdown
+            FROM detections
+            """
+        )
         conn.commit()
 
 

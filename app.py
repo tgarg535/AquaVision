@@ -52,6 +52,24 @@ def get_wallpaper_path() -> Optional[str]:
     return None
 
 
+def get_all_sample_images() -> list[str]:
+    """Finds all sample images in the Pictures directory."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    images = []
+    for folder in ["Pictures", "pictures"]:
+        p_dir = os.path.join(base_dir, folder)
+        if os.path.isdir(p_dir):
+            for fname in sorted(os.listdir(p_dir)):
+                if fname.lower().endswith((".jpg", ".jpeg", ".png")):
+                    full_p = os.path.join(p_dir, fname)
+                    if full_p not in images:
+                        images.append(full_p)
+    # Put wallpaper first if present
+    wallpapers = [p for p in images if "wallpaper" in os.path.basename(p).lower()]
+    others = [p for p in images if "wallpaper" not in os.path.basename(p).lower()]
+    return wallpapers + others
+
+
 def get_base64_image(image_path: str) -> str:
     """Encodes a local image file to base64 string."""
     with open(image_path, "rb") as img_file:
@@ -293,7 +311,7 @@ with col_sample:
     use_sample = st.checkbox(
         "Use Sample Underwater Image",
         value=False,
-        help="Load the bundled sample marine life image for instant verification.",
+        help="Load bundled sample marine life images for instant verification.",
     )
 
 # Determine image source
@@ -307,15 +325,22 @@ if uploaded_file is not None:
     except Exception as err:
         st.error(f"Error loading uploaded image: {err}")
 elif use_sample:
-    sample_path = get_wallpaper_path()
-    if sample_path and os.path.isfile(sample_path):
+    sample_list = get_all_sample_images()
+    if sample_list:
+        selected_sample = sample_list[0]
+        if len(sample_list) > 1:
+            selected_sample = st.selectbox(
+                "Select a sample image:",
+                options=sample_list,
+                format_func=lambda p: os.path.basename(p),
+            )
         try:
-            pil_image = Image.open(sample_path).convert("RGB")
-            image_filename = os.path.basename(sample_path)
+            pil_image = Image.open(selected_sample).convert("RGB")
+            image_filename = os.path.basename(selected_sample)
         except Exception as err:
             st.error(f"Error opening sample image: {err}")
     else:
-        st.warning("Sample image not found in Pictures folder.")
+        st.warning("No sample images found in Pictures folder.")
 
 # ---------------------------------------------------------
 # Processing Pipeline & Results

@@ -122,7 +122,16 @@ def run_inference(
                 }
             )
 
-    detections_df = pd.DataFrame(detections)
+    columns = [
+        "Class",
+        "Confidence Score",
+        "Bounding Box (x1, y1, x2, y2)",
+        "X1",
+        "Y1",
+        "X2",
+        "Y2",
+    ]
+    detections_df = pd.DataFrame(detections, columns=columns) if not detections else pd.DataFrame(detections)
     total_count = len(detections)
 
     return {
